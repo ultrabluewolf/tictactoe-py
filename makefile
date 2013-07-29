@@ -1,2 +1,3 @@
 
-clean: rm *.pyc
+clean:
+	rm *.pyc
