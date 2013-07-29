@@ -32,4 +32,5 @@ def check_diagonal_win(board,dgn):
 	pass
 
 def is_blank(sym):
-	return sys == Board.BLANK
+	return sym == Board.BLANK
+
