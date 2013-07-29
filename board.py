@@ -14,10 +14,15 @@ class Board:
 			for col in range(Board.MAX):
 				self.board[row].append(Board.BLANK)
 	
+	def replace(arr):
+		for row in range(Board.MAX):
+			for col in range(Board.MAX):
+				self.board[row][col] = arr[row][col]
+	
 	def __getitem__(self,i):
-		return self.grid[i]
+		return self.board[i]
 	def __setitem__(self,i,val):
-		self.grid[i]=val
+		self.board[i]=val
 	
 	def __str__(self):
 		s = ''
