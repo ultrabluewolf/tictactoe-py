@@ -11,5 +11,5 @@ boards = utils.read_input("input")
 
 for i in range(len(boards)):
 	print str(boards[i])
-	print is_winner(boards[i])
+	print "w=" + is_winner(boards[i])
 	print "\n"
