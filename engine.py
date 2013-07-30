@@ -1,57 +1,21 @@
 """..."""
 
-import board,player,validator,cmd
+import board,player,validator,cmd,re
 from cmd import *
 from board import *
 from validator import *
 from player import *
 
 class Engine(cmd.Cmd):
-	RESTART="restart"
-	STATUS="status"
-	QUIT="quit"
 	ROW=0
 	COL=1
 	P1='P1'
 	P2='P2'
-		
-	"""TODO"""
+	COORD_RE=re.compile('([1-' + str(Board.MAX) + ']),([1-' + str(Board.MAX) + '])')
+	
 	def run_cli(self):
 		self.prompt="ttt>>>"
 		self.cmdloop()
-		
-		#game setup
-		while False:
-					
-			#gameplay
-			while False:
-				#TODO...read command line input...parse...
-				print "..."
-				command="\n"
-				if self.num_players >= 1 and is_move(command):
-					loc=get_move_loc(command)
-					if self.turn == Engine.P1:
-						self.board[loc[Engine.ROW]][loc[Engine.COL]] = self.p1.sym
-					else:
-						self.board[loc[Engine.ROW]][loc[Engine.COL]] = self.p2.sym
-					print self.board
-					self.check_for_win()
-				elif command==Engine.RESTART:
-					self.restart()
-					break
-				elif command==Engine.STATUS:
-					print self.status
-				elif command==Engine.QUIT:
-					return
-				else: #ai player
-					if self.turn == Engine.P1:
-						loc=self.p1.next_move(self.board)
-						self.board[loc[Engine.ROW]][loc[Engine.COL]] = self.p1.sym
-					else:
-						loc=self.p2.next_move(self.board)
-						self.board[loc[Engine.ROW]][loc[Engine.COL]] = self.p2.sym
-					print self.board
-					self.check_for_win()
 	
 	"""TODO"""
 	def run_gui(self):
@@ -60,7 +24,8 @@ class Engine(cmd.Cmd):
 	def check_for_win(self):
 		winner = is_winner(self.board)
 		if not is_blank(winner):
-			print winner
+			print winner + " won!"
+			self.board.clear()
 			if self.p1.sym == winner:
 				self.p1_score+=1
 			else:
@@ -79,11 +44,34 @@ class Engine(cmd.Cmd):
 	
 	def do_status(self,arg):
 		"""Show current game status"""
-		print 'status'
+		print self.status()
 	
 	def do_move(self,arg):
 		"""Next move on board - x,y"""
-		print 'playing move - ' + arg
+		#print 'playing move - ' + arg
+		if self.num_players >= 1:
+			loc_strs=Engine.COORD_RE.findall(arg)[0]
+			loc = []
+			loc.append(int(loc_strs[Engine.ROW])-1)
+			loc.append(int(loc_strs[Engine.COL])-1)
+			if self.turn == Engine.P1:
+				self.board[loc[Engine.ROW]][loc[Engine.COL]] = self.p1.sym
+				self.turn = Engine.P2
+			else:
+				self.board[loc[Engine.ROW]][loc[Engine.COL]] = self.p2.sym
+				self.turn = Engine.P1
+			#print self.board
+			self.check_for_win()
+			
+		else: #ai player
+			if self.turn == Engine.P1:
+				loc=self.p1.next_move(self.board)
+				self.board[loc[Engine.ROW]][loc[Engine.COL]] = self.p1.sym
+			else:
+				loc=self.p2.next_move(self.board)
+				self.board[loc[Engine.ROW]][loc[Engine.COL]] = self.p2.sym
+			print self.board
+			self.check_for_win()
 	
 	def do_restart(self,arg):
 		"""Restart the game (setup)"""
@@ -98,7 +86,7 @@ class Engine(cmd.Cmd):
 		self.p2_score=0
 		self.turn=None
 		
-		print "How many human players? (0-2) "
+		print "How many human players? (0-2):",
 		input=raw_input()
 		try:
 			self.num_players = int(input)
@@ -107,7 +95,7 @@ class Engine(cmd.Cmd):
 		except ValueError:
 			self.num_players=1
 			
-		print "Enter X or O for player1: "
+		print "Enter X or O for player1:",
 		sym = raw_input().upper()
 		if not is_cross(sym) or not is_circ(sym):
 			sym = Board.CROSS
@@ -126,14 +114,17 @@ class Engine(cmd.Cmd):
 			self.turn=Engine.P1
 		else:
 			self.turn=Engine.P2
+		
+		print self.board
 	
 	
-	def precmd(self,line):
-		print "...pre"
-		return line
+#	def precmd(self,line):
+#		print "...pre"
+#		return line
 	
 	def postcmd(self,stop,line):
-		print "...post"
+		if not stop:
+			print self.board
 		return stop
 	
 	def preloop(self):
@@ -142,7 +133,7 @@ class Engine(cmd.Cmd):
 	
 	def postloop(self):
 		"""print final game status"""
-		print "...the score"
+		print self.status()
 	
 	def emptyline(self):
 		"""continue game"""
