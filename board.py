@@ -29,7 +29,7 @@ class Board:
 	def is_full(self):
 		for row in range(Board.MAX):
 			for col in range(Board.MAX):
-				if board[row][col]==Board.BLANK:
+				if self.board[row][col]==Board.BLANK:
 					return False
 		return True
 	

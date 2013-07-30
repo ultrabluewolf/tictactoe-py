@@ -7,6 +7,8 @@ from player import *
 
 class Engine:
 	RESTART="restart"
+	STATUS="status"
+	QUIT="quit"
 	ROW=0
 	COL=1
 	P1='P1'
@@ -46,13 +48,14 @@ class Engine:
 			#gameplay
 			while True:
 				#TODO...read command line input...parse...
-				Print "..."
+				print "..."
+				command="\n"
 				if self.num_players >= 1 and is_move(command):
 					loc=get_move_loc(command)
 					if self.turn == Engine.P1:
-						self.board[loc[ROW]][loc[COL]] = self.p1.sym
-					else
-						self.board[loc[ROW]][loc[COL]] = self.p2.sym
+						self.board[loc[Engine.ROW]][loc[Engine.COL]] = self.p1.sym
+					else:
+						self.board[loc[Engine.ROW]][loc[Engine.COL]] = self.p2.sym
 					print self.board
 					self.check_for_win()
 				elif command==Engine.RESTART:
@@ -65,10 +68,10 @@ class Engine:
 				else: #ai player
 					if self.turn == Engine.P1:
 						loc=self.p1.next_move(self.board)
-						self.board[loc[ROW]][loc[COL]] = self.p1.sym
+						self.board[loc[Engine.ROW]][loc[Engine.COL]] = self.p1.sym
 					else:
 						loc=self.p2.next_move(self.board)
-						self.board[loc[ROW]][loc[COL]] = self.p2.sym
+						self.board[loc[Engine.ROW]][loc[Engine.COL]] = self.p2.sym
 					print self.board
 					self.check_for_win()
 	
@@ -80,7 +83,7 @@ class Engine:
 		self=self__init__()
 	
 	def check_for_win(self):
-		winner = self.board.is_winner()
+		winner = is_winner(self.board)
 		if not is_blank(winner):
 			print winner
 			if self.p1.sym == winner:

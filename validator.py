@@ -91,5 +91,8 @@ def get_opposite(sym):
 		return Board.CIRC
 	elif sym == Board.CIRC:
 		return Board.CROSS
-	else
+	else:
 		return Board.BLANK
+
+def is_move(cmd):
+	return False
