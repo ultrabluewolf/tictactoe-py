@@ -1,11 +1,12 @@
 """..."""
 
-import board,player,validator
+import board,player,validator,cmd
+from cmd import *
 from board import *
 from validator import *
 from player import *
 
-class Engine:
+class Engine(cmd.Cmd):
 	RESTART="restart"
 	STATUS="status"
 	QUIT="quit"
@@ -13,40 +14,17 @@ class Engine:
 	COL=1
 	P1='P1'
 	P2='P2'
-	def __init__(self):
-		self.board=Board()
-		self.p1=None
-		self.p2=None
-		self.p1_score=0
-		self.p2_score=0
-		self.turn=None
-	
+		
 	"""TODO"""
 	def run_cli(self):
+		self.prompt="ttt>>>"
+		self.cmdloop()
+		
 		#game setup
-		while True:
-			"""TODO...cli input..."""
-			print "How many human players? (0-2) "
-			self.num_players=1
-			print "Enter X or O for player1: "
-			sym = "x"
-			if self.num_players==1:
-				self.p1=Player(sym,Engine.P1,True)
-				self.p2=Player(get_opposite(sym),Engine.P2,False)
-			elif self.num_players==2:
-				self.p1=Player(sym,Engine.P1,False)
-				self.p2=Player(get_opposite(sym),Engine.P2,False)
-			else: #AI players
-				self.p1=Player(sym,Engine.P1,True)
-				self.p2=Player(get_opposite(sym),Engine.P2,True)
-			
-			if self.p1.sym == Board.CROSS:
-				self.turn=Engine.P1
-			else:
-				self.turn=Engine.P2
-			
+		while False:
+					
 			#gameplay
-			while True:
+			while False:
 				#TODO...read command line input...parse...
 				print "..."
 				command="\n"
@@ -79,9 +57,6 @@ class Engine:
 	def run_gui(self):
 		pass
 	
-	def restart(self):
-		self=self__init__()
-	
 	def check_for_win(self):
 		winner = is_winner(self.board)
 		if not is_blank(winner):
@@ -96,4 +71,79 @@ class Engine:
 	
 	def status(self):
 		return "Scores:\n" + "p1: " + str(self.p1_score) + ", p2: " + str(self.p2_score)
+	
+	def do_quit(self,arg):
+		"""Quits the game"""
+		print 'exiting game'
+		return True
+	
+	def do_status(self,arg):
+		"""Show current game status"""
+		print 'status'
+	
+	def do_move(self,arg):
+		"""Next move on board - x,y"""
+		print 'playing move - ' + arg
+	
+	def do_restart(self,arg):
+		"""Restart the game (setup)"""
+		self.do_setup(arg)
+	
+	def do_setup(self,arg):
+		"""Setup game; defaults: P1 vs AI, with P1 as X"""
+		self.p1=None
+		self.p2=None
+		self.board=Board()
+		self.p1_score=0
+		self.p2_score=0
+		self.turn=None
 		
+		print "How many human players? (0-2) "
+		input=raw_input()
+		try:
+			self.num_players = int(input)
+			if self.num_players < 0 or self.num_players > 2:
+				self.num_players = 1
+		except ValueError:
+			self.num_players=1
+			
+		print "Enter X or O for player1: "
+		sym = raw_input().upper()
+		if not is_cross(sym) or not is_circ(sym):
+			sym = Board.CROSS
+		
+		if self.num_players==1:
+			self.p1=Player(sym,Engine.P1,True)
+			self.p2=Player(get_opposite(sym),Engine.P2,False)
+		elif self.num_players==2:
+			self.p1=Player(sym,Engine.P1,False)
+			self.p2=Player(get_opposite(sym),Engine.P2,False)
+		else: #AI players
+			self.p1=Player(sym,Engine.P1,True)
+			self.p2=Player(get_opposite(sym),Engine.P2,True)
+		
+		if self.p1.sym == Board.CROSS:
+			self.turn=Engine.P1
+		else:
+			self.turn=Engine.P2
+	
+	
+	def precmd(self,line):
+		print "...pre"
+		return line
+	
+	def postcmd(self,stop,line):
+		print "...post"
+		return stop
+	
+	def preloop(self):
+		"""game setup"""
+		self.do_setup("")
+	
+	def postloop(self):
+		"""print final game status"""
+		print "...the score"
+	
+	def emptyline(self):
+		"""continue game"""
+		pass
