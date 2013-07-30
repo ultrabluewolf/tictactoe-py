@@ -85,3 +85,11 @@ def is_cross(sym):
 	return sym == Board.CROSS
 def is_circ(sym):
 	return sym == Board.CIRC
+
+def get_opposite(sym):
+	if sym == Board.CROSS:
+		return Board.CIRC
+	elif sym == Board.CIRC:
+		return Board.CROSS
+	else
+		return Board.BLANK
