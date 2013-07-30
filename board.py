@@ -14,10 +14,24 @@ class Board:
 			for col in range(Board.MAX):
 				self.board[row].append(Board.BLANK)
 	
-	def replace(arr):
+	def replace(self,arr):
 		for row in range(Board.MAX):
 			for col in range(Board.MAX):
 				self.board[row][col] = arr[row][col]
+	
+	def clear(self):
+		self.board = []
+		for row in range(Board.MAX):
+			self.board.append([])
+			for col in range(Board.MAX):
+				self.board[row].append(Board.BLANK)
+	
+	def is_full(self):
+		for row in range(Board.MAX):
+			for col in range(Board.MAX):
+				if board[row][col]==Board.BLANK:
+					return False
+		return True
 	
 	def __getitem__(self,i):
 		return self.board[i]
