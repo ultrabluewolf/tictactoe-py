@@ -93,6 +93,3 @@ def get_opposite(sym):
 		return Board.CROSS
 	else:
 		return Board.BLANK
-
-def is_move(cmd):
-	return False
