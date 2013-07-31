@@ -33,6 +33,9 @@ class Board:
 					return False
 		return True
 	
+	def is_empty_spot(self,row,col):
+		return self.board[row][col] == Board.BLANK
+	
 	def __getitem__(self,i):
 		return self.board[i]
 	def __setitem__(self,i,val):

@@ -14,5 +14,8 @@ class Player:
 
 	"""TODO:examine board give next move"""
 	def next_move(self,board):
-		return [0,0]
+		if not self._is_ai:
+			return None
+		else:
+			return [0,0]
 	

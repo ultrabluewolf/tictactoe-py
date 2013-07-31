@@ -11,7 +11,9 @@ class Engine(cmd.Cmd):
 	COL=1
 	P1='P1'
 	P2='P2'
-	COORD_RE=re.compile('([1-' + str(Board.MAX) + ']),([1-' + str(Board.MAX) + '])')
+	COORD_RE=re.compile(
+		'([1-' + str(Board.MAX) + ']),' 
+			+ '([1-' + str(Board.MAX) + '])')
 	
 	def run_cli(self):
 		self.prompt="ttt>>>"
@@ -35,7 +37,9 @@ class Engine(cmd.Cmd):
 			self.board.clear()
 	
 	def status(self):
-		return "Scores:\n" + "p1: " + str(self.p1_score) + ", p2: " + str(self.p2_score)
+		return ("Scores:\n" 
+			+ "p1: " + str(self.p1_score) 
+				+ ", p2: " + str(self.p2_score))
 	
 	def do_quit(self,arg):
 		"""Quits the game"""
@@ -47,21 +51,24 @@ class Engine(cmd.Cmd):
 		print self.status()
 	
 	def do_move(self,arg):
-		"""Next move on board - x,y"""
+		"""Play next move on board - x,y"""
 		#print 'playing move - ' + arg
 		if self.num_players >= 1:
 			loc_strs=Engine.COORD_RE.findall(arg)[0]
 			loc = []
 			loc.append(int(loc_strs[Engine.ROW])-1)
 			loc.append(int(loc_strs[Engine.COL])-1)
-			if self.turn == Engine.P1:
-				self.board[loc[Engine.ROW]][loc[Engine.COL]] = self.p1.sym
-				self.turn = Engine.P2
+			
+			if self.board.is_empty_spot(loc[Engine.ROW],loc[Engine.COL]):
+				if self.turn == Engine.P1:
+					self.board[loc[Engine.ROW]][loc[Engine.COL]] = self.p1.sym
+					self.turn = Engine.P2
+				else:
+					self.board[loc[Engine.ROW]][loc[Engine.COL]] = self.p2.sym
+					self.turn = Engine.P1
+				self.check_for_win()
 			else:
-				self.board[loc[Engine.ROW]][loc[Engine.COL]] = self.p2.sym
-				self.turn = Engine.P1
-			#print self.board
-			self.check_for_win()
+				print "invalid move"
 			
 		else: #ai player
 			if self.turn == Engine.P1:
