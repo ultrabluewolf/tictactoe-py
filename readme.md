@@ -1,7 +1,7 @@
 Simple TicTacToe Game
 
 TODO: pygame interface
-TODO: game ai
+TODO: game ai debugging
 
 ---
 -x-
