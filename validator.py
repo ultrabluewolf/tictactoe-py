@@ -19,10 +19,10 @@ def is_winner(board):
 	
 	for col in range(Board.MAX):
 		result = check_col_win(board,col)
-		if not is_blank(result):
-			return result
+		#if not is_blank(result):
+		#	return result
 	
-	return Board.BLANK
+	return result
 
 def check_row_win(board,row):
 	crosses=[]
