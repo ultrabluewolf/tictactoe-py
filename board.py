@@ -64,17 +64,48 @@ class Board:
 	
 	def find_near_full_row(self,sym,row):
 		syms=[]
+		loc=None
 		for col in range(Board.MAX):
-			if sym = self.board[row][col]:
+			if sym == self.board[row][col]:
 				syms.append(sym)
-				if len(syms) == Board.MAX-1:
-					return [row,col]
-		return None
+		if len(syms) != Board.MAX-1:
+			loc=None
+		return loc
 		
 	def find_near_full_col(self,sym,col):
-		pass
+		syms=[]
+		loc=None
+		for row in range(Board.MAX):
+			if sym == self.board[row][col]:
+				syms.append(sym)
+		if len(syms) != Board.MAX-1:
+			loc=None
+		return loc
+		
 	def find_near_full_diagonal(self,sym,diag):
-		pass
+		syms=[]
+		loc=None
+		
+		if dgn == 0:
+			for i in range(Board.MAX):
+				if sym == self.board[i][i]:
+					syms.append(sym)
+				else:
+					loc = [i,i]
+			if len(syms) != Board.MAX-1:
+				loc = None
+					
+		elif dgn == 1:
+			col = Board.MAX-1
+			for row in range(Board.MAX):
+				if sym = self.board[row][col]:
+					syms.append(sym)
+				else:
+					loc = [row,col]
+				col-=1
+			if len(syms) != Board.MAX-1:
+				loc = None
+		return loc
 	
 	def __getitem__(self,i):
 		return self.board[i]
