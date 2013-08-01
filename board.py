@@ -36,6 +36,10 @@ class Board:
 	def is_empty_spot(self,row,col):
 		return self.board[row][col] == Board.BLANK
 	
+	#TODO: return first location found, where it's corressponding row/col/diagonal is almost complete
+	def find_near_full(self,sym):
+		return [0,0]
+	
 	def __getitem__(self,i):
 		return self.board[i]
 	def __setitem__(self,i,val):
