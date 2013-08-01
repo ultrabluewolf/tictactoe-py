@@ -36,9 +36,45 @@ class Board:
 	def is_empty_spot(self,row,col):
 		return self.board[row][col] == Board.BLANK
 	
-	#TODO: return first location found, where it's corressponding row/col/diagonal is almost complete
+	def find_empty_spots(self):
+		lst=[]
+		for row in range(Board.MAX):
+			for col in range(Board.MAX):
+				if self.is_empty_spot(row,col):
+					lst.append([row,col])
+		return lst
+	
+	#TODO: return first location found, where its corresponding row/col/diagonal is almost complete
 	def find_near_full(self,sym):
-		return [0,0]
+		loc = None
+		for dgn in range(Board.DGN):
+			loc = self.find_near_full_diagonal(sym,diag)
+		if loc != None:
+			return loc
+			
+		for row in range(Board.MAX):
+			loc = self.find_near_full_row(sym,row)
+		if loc != None:
+			return loc
+			
+		for col in range(Board.MAX):
+			loc = self.find_near_full_col(sym,col)
+			
+		return loc
+	
+	def find_near_full_row(self,sym,row):
+		syms=[]
+		for col in range(Board.MAX):
+			if sym = self.board[row][col]:
+				syms.append(sym)
+				if len(syms) == Board.MAX-1:
+					return [row,col]
+		return None
+		
+	def find_near_full_col(self,sym,col):
+		pass
+	def find_near_full_diagonal(self,sym,diag):
+		pass
 	
 	def __getitem__(self,i):
 		return self.board[i]
