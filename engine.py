@@ -74,10 +74,12 @@ class Engine(cmd.Cmd):
 			if self.turn == Engine.P1:
 				loc=self.p1.next_move(self.board)
 				self.board[loc[Engine.ROW]][loc[Engine.COL]] = self.p1.sym
+				self.turn = Engine.P2
 			else:
 				loc=self.p2.next_move(self.board)
 				self.board[loc[Engine.ROW]][loc[Engine.COL]] = self.p2.sym
-			print self.board
+				self.turn = Engine.P1
+			#print self.board
 			self.check_for_win()
 	
 	def do_restart(self,arg):
@@ -144,4 +146,4 @@ class Engine(cmd.Cmd):
 	
 	def emptyline(self):
 		"""continue game"""
-		pass
+		self.do_move(None)

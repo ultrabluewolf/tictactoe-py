@@ -48,7 +48,7 @@ class Board:
 	def find_near_full(self,sym):
 		loc = None
 		for dgn in range(Board.DGN):
-			loc = self.find_near_full_diagonal(sym,diag)
+			loc = self.find_near_full_diagonal(sym,dgn)
 		if loc != None:
 			return loc
 			
@@ -82,7 +82,7 @@ class Board:
 			loc=None
 		return loc
 		
-	def find_near_full_diagonal(self,sym,diag):
+	def find_near_full_diagonal(self,sym,dgn):
 		syms=[]
 		loc=None
 		
@@ -98,7 +98,7 @@ class Board:
 		elif dgn == 1:
 			col = Board.MAX-1
 			for row in range(Board.MAX):
-				if sym = self.board[row][col]:
+				if sym == self.board[row][col]:
 					syms.append(sym)
 				else:
 					loc = [row,col]
