@@ -1,11 +1,6 @@
 Simple TicTacToe Game
 
 TODO: pygame interface
-TODO: game ai debugging
-
----
--x-
----
 
 ai rules:
 1	play win

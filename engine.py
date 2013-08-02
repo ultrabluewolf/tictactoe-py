@@ -1,6 +1,7 @@
 """..."""
 
-import board,player,validator,cmd,re
+import pygame,sys,board,player,validator,cmd,re
+from pygame.locals import *
 from cmd import *
 from board import *
 from validator import *
@@ -21,7 +22,16 @@ class Engine(cmd.Cmd):
 	
 	"""TODO"""
 	def run_gui(self):
-		pass
+		pygame.init()
+		window_surf=pygame.display.set_mode((350,350))
+		pygame.display.set_caption('TicTacToe')
+		
+		mouse_x, mouse_y = 0,0
+		while True:
+			for event in pygame.event.get():
+				if event.type == QUIT:
+					pygame.quit()
+					sys.exit()
 	
 	def check_for_win(self):
 		winner = is_winner(self.board)
