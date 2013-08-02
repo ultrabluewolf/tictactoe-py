@@ -17,7 +17,7 @@ class Player:
 		loc = None
 		if self.is_ai and not board.is_full():
 			loc1 = board.find_near_full(self.sym)
-			loc2 = loc = board.find_near_full(validator.get_opposite(self.sym))
+			loc2 = board.find_near_full(validator.get_opposite(self.sym))
 			if loc1 != None:
 				loc = loc1
 			elif loc2 != None:
