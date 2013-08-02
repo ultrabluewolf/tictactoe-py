@@ -18,7 +18,8 @@ for i in range(len(boards)):
 	
 #--------------------------------------
 
-print 'player.next_move tests:'
+print('\n-----------------\n\n'
+		+ 'player.next_move tests:')
 boards = utils.read_input("input-ai")
 for i in range(len(boards)):
 	p1=Player(Board.CROSS,Engine.P1,True)
