@@ -49,17 +49,19 @@ class Board:
 		loc = None
 		for dgn in range(Board.DGN):
 			loc = self.find_near_full_diagonal(sym,dgn)
-		if loc != None:
-			return loc
+			if loc != None:
+				return loc
 			
 		for row in range(Board.MAX):
 			loc = self.find_near_full_row(sym,row)
-		if loc != None:
-			return loc
+			if loc != None:
+				return loc
 			
 		for col in range(Board.MAX):
 			loc = self.find_near_full_col(sym,col)
-			
+			if loc != None:
+				return loc
+
 		return loc
 	
 	def find_near_full_row(self,sym,row):
@@ -68,6 +70,8 @@ class Board:
 		for col in range(Board.MAX):
 			if sym == self.board[row][col]:
 				syms.append(sym)
+			elif Board.BLANK == self.board[row][col]:
+				loc = [row,col]
 		if len(syms) != Board.MAX-1:
 			loc=None
 		return loc
@@ -78,6 +82,8 @@ class Board:
 		for row in range(Board.MAX):
 			if sym == self.board[row][col]:
 				syms.append(sym)
+			elif Board.BLANK == self.board[row][col]:
+				loc = [row,col]
 		if len(syms) != Board.MAX-1:
 			loc=None
 		return loc
@@ -90,7 +96,7 @@ class Board:
 			for i in range(Board.MAX):
 				if sym == self.board[i][i]:
 					syms.append(sym)
-				else:
+				elif Board.BLANK == self.board[i][i]:
 					loc = [i,i]
 			if len(syms) != Board.MAX-1:
 				loc = None
@@ -100,7 +106,7 @@ class Board:
 			for row in range(Board.MAX):
 				if sym == self.board[row][col]:
 					syms.append(sym)
-				else:
+				elif Board.BLANK == self.board[row][col]:
 					loc = [row,col]
 				col-=1
 			if len(syms) != Board.MAX-1:
