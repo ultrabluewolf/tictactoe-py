@@ -26,12 +26,29 @@ class Engine(cmd.Cmd):
 		window_surf=pygame.display.set_mode((350,350))
 		pygame.display.set_caption('TicTacToe')
 		
+		font_obj = pygame.font.Font('freesansbold.ttf',10)
+		msg = '-'
+		
 		mouse_x, mouse_y = 0,0
 		while True:
+			msg_surf_obj = font_obj.render(msg,False, pygame.Color(190,190,190))
+			msg_rect_obj = msg_surf_obj.get_rect()
+			msg_rect_obj.topleft = (10,20)
+			
 			for event in pygame.event.get():
 				if event.type == QUIT:
 					pygame.quit()
 					sys.exit()
+				elif event.type == MOUSEMOTION:
+					mouse_x, mouse_y = event.pos
+					msg = str(mouse_x) + ',' + str(mouse_y)
+				elif event.type == MOUSEBUTTONUP:
+					mouse_x, mouse_y = event.pos
+					if event.button in (1,2,3):
+						pass
+				elif event.type == KEYDOWN:
+					if event.key == K_ESCAPE:
+						pygame.event.post(pygame.event.Event(QUIT))
 	
 	def check_for_win(self):
 		winner = is_winner(self.board)
