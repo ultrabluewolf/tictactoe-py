@@ -16,6 +16,13 @@ class Engine(cmd.Cmd):
 		'([1-' + str(Board.MAX) + ']),' 
 			+ '([1-' + str(Board.MAX) + '])')
 	
+	def run(self,is_gui):
+		self.is_gui = is_gui
+		if is_gui:
+			self.run_gui()
+		else:
+			self.run_cli()
+	
 	def run_cli(self):
 		self.prompt="ttt>>>"
 		self.cmdloop()
@@ -23,17 +30,31 @@ class Engine(cmd.Cmd):
 	"""TODO"""
 	def run_gui(self):
 		pygame.init()
-		window_surf=pygame.display.set_mode((350,350))
+		window=pygame.display.set_mode((350,350))
 		pygame.display.set_caption('TicTacToe')
 		
-		font_obj = pygame.font.Font('freesansbold.ttf',10)
-		msg = '-'
+		dk_gray=pygame.Color(25,25,25)
+		lt_gray=pygame.Color(190,190,190)
+		
+		mfont = pygame.font.Font('freesansbold.ttf',17)
+		msg = '(0,0)'
+		
+		grid = []
+		for row in range(Board.MAX):
+			grid.append([])
+			for col in range(Board.MAX):
+				grid[row].append(pygame.Surface((50,50),HWSURFACE,window))
+				grid_rect = grid[row][col].get_rect()
+				grid_rect.topleft = (row*5,col*5)
 		
 		mouse_x, mouse_y = 0,0
 		while True:
-			msg_surf_obj = font_obj.render(msg,False, pygame.Color(190,190,190))
-			msg_rect_obj = msg_surf_obj.get_rect()
-			msg_rect_obj.topleft = (10,20)
+			window.fill(dk_gray)
+			
+			msg_surf = mfont.render(msg,False, lt_gray)
+			msg_rect = msg_surf.get_rect()
+			msg_rect.topleft = (10,window.get_height()-25)
+			window.blit(msg_surf,msg_rect)
 			
 			for event in pygame.event.get():
 				if event.type == QUIT:
@@ -41,7 +62,7 @@ class Engine(cmd.Cmd):
 					sys.exit()
 				elif event.type == MOUSEMOTION:
 					mouse_x, mouse_y = event.pos
-					msg = str(mouse_x) + ',' + str(mouse_y)
+					msg = '('+str(mouse_x) + ',' + str(mouse_y)+')'
 				elif event.type == MOUSEBUTTONUP:
 					mouse_x, mouse_y = event.pos
 					if event.button in (1,2,3):
@@ -49,6 +70,8 @@ class Engine(cmd.Cmd):
 				elif event.type == KEYDOWN:
 					if event.key == K_ESCAPE:
 						pygame.event.post(pygame.event.Event(QUIT))
+			
+			pygame.display.update()
 	
 	def check_for_win(self):
 		winner = is_winner(self.board)
