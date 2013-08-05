@@ -1,6 +1,7 @@
 """..."""
 
 import pygame,sys,board,player,validator,cmd,re
+#import pygame._view
 from pygame.locals import *
 from cmd import *
 from board import *
@@ -9,6 +10,7 @@ from player import *
 
 class Engine(cmd.Cmd):
 	GFONT='/usr/share/fonts/truetype/msttcorefonts/arial.ttf'
+	#GFONT='C:\Windows\Fonts\Arial.ttf'
 	ROW=0
 	COL=1
 	P1='P1'
