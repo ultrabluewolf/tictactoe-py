@@ -8,6 +8,7 @@ from validator import *
 from player import *
 
 class Engine(cmd.Cmd):
+	GFONT='/usr/share/fonts/truetype/msttcorefonts/arial.ttf'
 	ROW=0
 	COL=1
 	P1='P1'
@@ -29,32 +30,56 @@ class Engine(cmd.Cmd):
 	
 	"""TODO"""
 	def run_gui(self):
+		self.do_setup('')
+	
 		pygame.init()
 		window=pygame.display.set_mode((350,350))
 		pygame.display.set_caption('TicTacToe')
 		
 		dk_gray=pygame.Color(25,25,25)
+		md_gray=pygame.Color(90,90,90)
 		lt_gray=pygame.Color(190,190,190)
+		red=pygame.Color(150,50,70)
+		orange=pygame.Color(200,130,50)
 		
-		mfont = pygame.font.Font('freesansbold.ttf',17)
-		msg = '(0,0)'
-		
-		grid = []
-		for row in range(Board.MAX):
-			grid.append([])
-			for col in range(Board.MAX):
-				grid[row].append(pygame.Surface((50,50),HWSURFACE,window))
-				grid_rect = grid[row][col].get_rect()
-				grid_rect.topleft = (row*5,col*5)
+		mfont = pygame.font.Font(Engine.GFONT,17)
+		sfont = pygame.font.Font(Engine.GFONT,15)
+		bfont = pygame.font.Font(Engine.GFONT,90)
+		msg1 = '(0,0)'
+		msg2 = '(0,0)'
+		s_msg = '...'
 		
 		mouse_x, mouse_y = 0,0
 		while True:
 			window.fill(dk_gray)
+			s_msg = self.status()
 			
-			msg_surf = mfont.render(msg,False, lt_gray)
-			msg_rect = msg_surf.get_rect()
-			msg_rect.topleft = (10,window.get_height()-25)
-			window.blit(msg_surf,msg_rect)
+			msg_surf1 = mfont.render(msg1,True, md_gray)
+			msg_surf2 = mfont.render(msg2,True, md_gray)
+			s_msg_surf = sfont.render(s_msg,True, lt_gray)
+			msg_rect1 = msg_surf1.get_rect()
+			msg_rect2 = msg_surf2.get_rect()
+			s_msg_rect = s_msg_surf.get_rect()
+			msg_rect1.topleft = (10,window.get_height()-25)
+			msg_rect2.topleft = (window.get_width()-75,window.get_height()-25)
+			s_msg_rect.topleft = (10,10)
+			window.blit(msg_surf1,msg_rect1)
+			window.blit(msg_surf2,msg_rect2)
+			window.blit(s_msg_surf,s_msg_rect)
+			
+			
+			grid = []
+			for row in range(Board.MAX):
+				grid.append([])
+				for col in range(Board.MAX):
+					grid[row].append(pygame.Rect((55+row*90,45+col*90),(75,75)))
+					if self.board[row][col] == 'X':
+						grid_font = bfont.render(self.board[row][col],True, orange)
+					elif self.board[row][col] == 'O':
+						grid_font = bfont.render(self.board[row][col],True, red)
+					else:
+						grid_font = bfont.render('?',True, lt_gray)
+					window.blit(grid_font,grid[row][col])
 			
 			for event in pygame.event.get():
 				if event.type == QUIT:
@@ -62,16 +87,26 @@ class Engine(cmd.Cmd):
 					sys.exit()
 				elif event.type == MOUSEMOTION:
 					mouse_x, mouse_y = event.pos
-					msg = '('+str(mouse_x) + ',' + str(mouse_y)+')'
+					msg1 = '('+str(mouse_x) + ',' + str(mouse_y)+')'
 				elif event.type == MOUSEBUTTONUP:
 					mouse_x, mouse_y = event.pos
 					if event.button in (1,2,3):
-						pass
+						msg2 = '('+str(mouse_x) + ',' + str(mouse_y)+')'
+						
+						for row in range(Board.MAX):
+							for col in range(Board.MAX):
+								g_rect = grid[row][col]
+								if (g_rect.collidepoint(mouse_x,mouse_y)):
+									move_str = str(row+1) + ',' +str(col+1)
+									self.do_move(move_str)
+									#self.board[row][col] = 'X'
+							
 				elif event.type == KEYDOWN:
 					if event.key == K_ESCAPE:
 						pygame.event.post(pygame.event.Event(QUIT))
 			
 			pygame.display.update()
+	
 	
 	def check_for_win(self):
 		winner = is_winner(self.board)
@@ -87,9 +122,15 @@ class Engine(cmd.Cmd):
 			self.board.clear()
 	
 	def status(self):
-		return ("Scores:\n" 
-			+ "p1: " + str(self.p1_score) 
-				+ ", p2: " + str(self.p2_score))
+		if self.is_gui:
+			return ("P1: " + str(self.p1_score) 
+					+ "   P2: " + str(self.p2_score)
+						+ "                                " 
+							+ "Current Turn: " + str(self.turn))
+		else:
+			return ("Scores:\n" 
+				+ "p1: " + str(self.p1_score) 
+					+ ", p2: " + str(self.p2_score))
 	
 	def do_quit(self,arg):
 		"""Quits the game"""
@@ -103,7 +144,12 @@ class Engine(cmd.Cmd):
 	def do_move(self,arg):
 		"""Play next move on board - x,y"""
 		#print 'playing move - ' + arg
-		if self.num_players >= 1:
+		p1_move = self.p1.next_move(self.board)
+		p2_move = self.p2.next_move(self.board)
+		
+		if self.num_players >= 1 and (
+				(self.turn == Engine.P1 and p1_move == None) or 
+					(self.turn == Engine.P2 and p2_move == None)):
 			loc_strs=Engine.COORD_RE.findall(arg)[0]
 			loc = []
 			loc.append(int(loc_strs[Engine.ROW])-1)
@@ -122,12 +168,12 @@ class Engine(cmd.Cmd):
 			
 		else: #ai player
 			if self.turn == Engine.P1:
-				loc=self.p1.next_move(self.board)
-				self.board[loc[Engine.ROW]][loc[Engine.COL]] = self.p1.sym
+				#loc=self.p1.next_move(self.board)
+				self.board[p1_move[Engine.ROW]][p1_move[Engine.COL]] = self.p1.sym
 				self.turn = Engine.P2
 			else:
-				loc=self.p2.next_move(self.board)
-				self.board[loc[Engine.ROW]][loc[Engine.COL]] = self.p2.sym
+				#loc=self.p2.next_move(self.board)
+				self.board[p2_move[Engine.ROW]][p2_move[Engine.COL]] = self.p2.sym
 				self.turn = Engine.P1
 			#print self.board
 			self.check_for_win()
@@ -160,8 +206,8 @@ class Engine(cmd.Cmd):
 			sym = Board.CROSS
 		
 		if self.num_players==1:
-			self.p1=Player(sym,Engine.P1,True)
-			self.p2=Player(get_opposite(sym),Engine.P2,False)
+			self.p1=Player(sym,Engine.P1,False)
+			self.p2=Player(get_opposite(sym),Engine.P2,True)
 		elif self.num_players==2:
 			self.p1=Player(sym,Engine.P1,False)
 			self.p2=Player(get_opposite(sym),Engine.P2,False)
