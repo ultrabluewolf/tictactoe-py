@@ -50,6 +50,8 @@ class Engine(cmd.Cmd):
 		s_msg = '...'
 		
 		mouse_x, mouse_y = 0,0
+		prev_hover = None
+		prev_collide = None
 		while True:
 			window.fill(dk_gray)
 			s_msg = self.status()
@@ -77,6 +79,10 @@ class Engine(cmd.Cmd):
 						grid_font = bfont.render(self.board[row][col],True, orange)
 					elif self.board[row][col] == 'O':
 						grid_font = bfont.render(self.board[row][col],True, red)
+					elif self.gui_board[row][col] == 'X':
+						grid_font = bfont.render(self.gui_board[row][col],True, md_gray)
+					elif self.gui_board[row][col] == 'O':
+						grid_font = bfont.render(self.gui_board[row][col],True, md_gray)
 					else:
 						grid_font = bfont.render('?',True, lt_gray)
 					window.blit(grid_font,grid[row][col])
@@ -88,6 +94,28 @@ class Engine(cmd.Cmd):
 				elif event.type == MOUSEMOTION:
 					mouse_x, mouse_y = event.pos
 					msg1 = '('+str(mouse_x) + ',' + str(mouse_y)+')'
+					
+					# symbol hover -- on human player turns
+					for row in range(Board.MAX):
+						for col in range(Board.MAX):
+							g_rect = grid[row][col]
+							if (g_rect.collidepoint(mouse_x,mouse_y) 
+									and prev_collide != g_rect and (
+										(self.turn == Engine.P1 and not self.p1.is_ai) or (
+											self.turn == Engine.P2 and not self.p2.is_ai))):
+								if self.turn == Engine.P1:
+									#grid_font = bfont.render(self.p1.sym,True, md_gray)
+									self.gui_board[row][col] = self.p1.sym
+								else:
+									#grid_font = bfont.render(self.p2.sym,True, md_gray)
+									self.gui_board[row][col] = self.p2.sym
+								#window.blit(grid_font,grid[row][col])
+								if prev_hover != None:
+									self.gui_board[prev_hover[0]][prev_hover[1]] = (
+											self.board[prev_hover[0]][prev_hover[1]])
+								prev_hover = (row,col)
+								prev_collide = g_rect
+					
 				elif event.type == MOUSEBUTTONUP:
 					mouse_x, mouse_y = event.pos
 					if event.button in (1,2,3):
@@ -113,6 +141,7 @@ class Engine(cmd.Cmd):
 		if not is_blank(winner):
 			print winner + " won!"
 			self.board.clear()
+			self.gui_board.clear()
 			if self.p1.sym == winner:
 				self.p1_score+=1
 			else:
@@ -120,6 +149,7 @@ class Engine(cmd.Cmd):
 		if self.board.is_full():
 			print "tied game"
 			self.board.clear()
+			self.gui_board.clear()
 	
 	def status(self):
 		if self.is_gui:
@@ -158,9 +188,11 @@ class Engine(cmd.Cmd):
 			if self.board.is_empty_spot(loc[Engine.ROW],loc[Engine.COL]):
 				if self.turn == Engine.P1:
 					self.board[loc[Engine.ROW]][loc[Engine.COL]] = self.p1.sym
+					self.gui_board[loc[Engine.ROW]][loc[Engine.COL]] = self.p1.sym
 					self.turn = Engine.P2
 				else:
 					self.board[loc[Engine.ROW]][loc[Engine.COL]] = self.p2.sym
+					self.gui_board[loc[Engine.ROW]][loc[Engine.COL]] = self.p1.sym
 					self.turn = Engine.P1
 				self.check_for_win()
 			else:
@@ -170,10 +202,13 @@ class Engine(cmd.Cmd):
 			if self.turn == Engine.P1:
 				#loc=self.p1.next_move(self.board)
 				self.board[p1_move[Engine.ROW]][p1_move[Engine.COL]] = self.p1.sym
+				self.gui_board[p1_move[Engine.ROW]][p1_move[Engine.COL]] = self.p1.sym
+				
 				self.turn = Engine.P2
 			else:
 				#loc=self.p2.next_move(self.board)
 				self.board[p2_move[Engine.ROW]][p2_move[Engine.COL]] = self.p2.sym
+				self.gui_board[p2_move[Engine.ROW]][p2_move[Engine.COL]] = self.p2.sym
 				self.turn = Engine.P1
 			#print self.board
 			self.check_for_win()
@@ -190,6 +225,9 @@ class Engine(cmd.Cmd):
 		self.p1_score=0
 		self.p2_score=0
 		self.turn=None
+		
+		#gui prep.
+		self.gui_board=Board()
 		
 		print "How many human players? (0-2):",
 		input=raw_input()
@@ -220,7 +258,8 @@ class Engine(cmd.Cmd):
 		else:
 			self.turn=Engine.P2
 		
-		print self.board
+		if (not self.is_gui):
+			print self.board
 	
 	
 #	def precmd(self,line):
